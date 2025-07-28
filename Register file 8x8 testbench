@@ -1,0 +1,54 @@
+`timescale 1ns / 1ps
+module Register_file_8x8_tb;
+reg clk;
+reg enable;
+reg [2:0] wr_addr,rd_addr1,rd_addr2;
+reg [7:0] data_in;
+wire [7:0] data_out1, data_out2;
+
+Register_file_8x8 uut(
+.clk(clk),
+.enable(enable),
+.wr_addr(wr_addr),
+.rd_addr1(rd_addr1),
+.rd_addr2(rd_addr2),
+.data_in(data_in),
+.data_out1(data_out1),
+.data_out2(data_out2)
+);
+//10ns period
+initial begin
+clk=0;
+forever #5 clk=~clk;
+end
+initial begin  
+//Disable writing at first
+enable = 0;
+data_in = 8'd0;
+wr_addr = 3'd0;
+rd_addr1 = 3'd0;
+rd_addr2 = 3'd1;
+#10;
+
+// Assign value
+enable = 1;
+wr_addr = 3'd3;
+data_in = 8'd42;
+#10;
+
+// Assign value
+wr_addr = 3'd1;
+data_in = 8'd99;
+#10;
+
+// Read register only
+enable = 0;
+rd_addr1 = 3'd3;
+rd_addr2 = 3'd1;
+#10;
+
+$display("Read reg[3] = %d, reg[1] = %d", data_out1, data_out2);
+// Expected: reg[3] = 42, reg[1] = 99
+$finish;
+end
+endmodule
